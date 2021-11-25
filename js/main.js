@@ -231,6 +231,7 @@ function renderBoard(board) {
 function cellClicked(elCell, i, j) {
     var cell = gBoard[i][j];
     if (cell.isShown) return;
+    if (!gGame.isOn) return;
     if (gGame.shownCount === 0) {
         placeMines(gBoard, i, j);
         gGameInterval = setInterval(() => {
@@ -268,6 +269,7 @@ function cellClicked(elCell, i, j) {
 
 //Called on right click to mark a cell (suspected to be a mine) Search the web (and implement) how to hide the context menu on right click
 function cellMarked(elCell, i, j) {
+    if (!gGame.isOn) return;
     if (gBoard[i][j].isShown == false) {
         if (!gBoard[i][j].isMarked) {
             if (gGame.markedCount < gLevel.MINES) {
@@ -291,12 +293,16 @@ function cellMarked(elCell, i, j) {
 
 //Game ends when all mines are marked, and all the other cells are shown
 function checkGameOver() {
-    var allMinesMarked = true;
-
+    var allMinesMarked;
+    var markedMines = 0;
+    var shownMines = 0;
     for (var i = 0; i < gMines.length; i++) {
         var currMine = gBoard[gMines[i].i][gMines[i].j]
-        if (!currMine.isMarked) allMinesMarked = false;
+        if (currMine.isMarked) markedMines++;
+        if (currMine.isShown) shownMines++;
     }
+    if (markedMines + shownMines === gLevel.MINES) allMinesMarked = true;
+    else allMinesMarked = false;
     //console.log("allMinesMarked", allMinesMarked)
     if (gGame.shownCount === (gLevel.SIZE ** 2 - gLevel.MINES) && allMinesMarked) {
         clearInterval(gGameInterval);
