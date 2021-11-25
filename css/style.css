@@ -20,6 +20,17 @@ h1{
     
 }
 
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: skyblue;
+    color: white;
+    text-align: center;
+    font-family:monospace;
+    font-size: 15;
+  }
 
 table {
     margin-top: 10px;
