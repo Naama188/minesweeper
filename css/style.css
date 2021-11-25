@@ -1,0 +1,112 @@
+body {
+    background-color: aliceblue;
+    text-align: center;
+    background-image: url(../img/supermario1.jpg);
+    background-attachment: fixed;
+    font-family:monospace;
+    font-size: medium;
+    font-weight: bold;
+    
+    
+}
+h1{
+    margin: 10px;
+}
+
+.header{
+
+    margin: auto;
+    -webkit-text-stroke: black 0.5px;
+    
+}
+
+
+table {
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+table td{
+    border: solid,10px,black;
+}
+
+.cell {
+    text-align: center;
+   width: 25px;
+   height: 25px;
+    
+}
+.hidden {
+    background-color:rgb(212, 106, 31);
+   
+   
+    border-radius: 10%;
+ }
+
+.shown {
+    background-color:rgb(250, 156, 89);
+    border: 10px,solid,black;
+    border-radius: 10%;
+    
+ }
+
+ .buttons {
+    text-align: center; 
+    margin-bottom: 10px;
+   
+}
+
+.time{ 
+    text-align: center;
+    color: white;
+    display: inline; 
+    font-size: 30;
+    margin-right: 20px;
+    
+}
+
+.smiley{
+    text-align: center;
+    display: inline;
+}
+
+.life {
+    text-align: center;
+    display: inline;
+    color: white;
+    left: 0px;
+    margin-right: 20px;
+    font-size: 30;
+    
+}
+
+.buttons button{
+    margin-left:10px;
+    margin-right: 10px;
+    border-radius: 4px;
+    background-color:rgb(212, 106, 31);
+    color: white;
+    font-family:Lucida Sans Unicode;
+    cursor: pointer;
+}
+
+.buttons .b1{
+    background-color: rgb(64, 64, 241);
+}
+
+.buttons .b2{
+    background-color: rgb(38, 129, 58);
+}
+
+.buttons .b3{
+    background-color: rgb(197, 36, 36);
+}
+
+.marked {
+    color: white;
+    display: inline;
+    font-size: 30;
+    margin-right: 20px;
+    
+}
