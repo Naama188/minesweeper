@@ -25,11 +25,11 @@ h1{
     left: 0;
     bottom: 0;
     width: 100%;
-    background-color: skyblue;
+    background-color: #60b14f;
     color: white;
     text-align: center;
     font-family:monospace;
-    font-size: 15;
+    font-size: 17;
   }
 
 table {
