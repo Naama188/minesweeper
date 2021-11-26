@@ -32,6 +32,7 @@ var gLives = 1;
 window.addEventListener("contextmenu", e => e.preventDefault());
 
 function initGame() {
+    clearInterval(gGameInterval);
     switch (gLevel.SIZE) {
         case 4:
             gLives = 1;
