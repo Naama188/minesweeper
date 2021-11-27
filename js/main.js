@@ -2,9 +2,6 @@
 
 const MINE = '💣';
 const FLAG = '🚩';
-const SMILEYNORMAL = '😃';
-const SMILEYDEAD = '😢';
-const SMILEYWIN = '😎'
 
 var gBoard = [];
 var gMines = [];
@@ -57,12 +54,10 @@ function renderGame() {
     renderBoard(gBoard);
     renderLives()
     renderSmiley();
-    renderMarked();
     renderBestScore();
 }
 
 function chooseLevel(level) {
-
     clearInterval(gGameInterval);
     resetTimer();
     switch (level.innerText) {
@@ -89,7 +84,6 @@ function chooseLevel(level) {
 
 function buildBoard() {
     var board = createBoard(gLevel.SIZE);
-
     for (var i = 0; i < board.length; i++) {
         for (var j = 0; j < board.length; j++) {
             var cell = {
@@ -104,42 +98,7 @@ function buildBoard() {
     return board;
 }
 
-function placeMines(board, idxI, idxJ) {
-    gMines = [];
-    var mineCount = 0;
-    while (mineCount < gLevel.MINES) {
-        var i = getRandomInt(0, gLevel.SIZE);
-        var j = getRandomInt(0, gLevel.SIZE);
-        if (!board[i][j].isMine && (i !== idxI && j !== idxJ)) {
-            board[i][j].isMine = true;
-            gMines.push({ i: i, j: j })
-            mineCount++;
-        }
-    }
-    for (var i = 0; i < board.length; i++) {
-        for (var j = 0; j < board[0].length; j++) {
-            if (!board[i][j].isMine) {
-                board[i][j].minesAroundCount = setMinesNegsCount(i, j, board)
-            }
-        }
-    }
 
-
-    return board;
-}
-
-function setMinesNegsCount(cellI, cellJ, mat) {
-    var negsCount = 0;
-    for (var i = cellI - 1; i <= cellI + 1; i++) {
-        if (i < 0 || i > mat.length - 1) continue;
-        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
-            if (j < 0 || j > mat[i].length - 1) continue;
-            if (i === cellI && j === cellJ) continue;
-            if (mat[i][j].isMine) negsCount++;
-        }
-    }
-    return negsCount;
-}
 
 function renderSmiley() {
     var strHtmlSmiley = `<button onclick="initGame()">`;
@@ -147,14 +106,12 @@ function renderSmiley() {
     var win = '<img src="img/starman.png" style="height:40px">';
     var lose = '<img src="img/koopa.png" style="height:40px">';
     strHtmlSmiley += gGame.isOn ? normal : gIsVictory ? win : lose;
-    //StrHtmlSmiley += gGame.isOn ? SMILEYNORMAL : gIsVictory ? SMILEYWIN : SMILEYDEAD;
-    console.log("gGame.isOn", gGame.isOn);
-    console.log("gIsVictory", gIsVictory);
+    //console.log("gGame.isOn", gGame.isOn);
+    //console.log("gIsVictory", gIsVictory);
     strHtmlSmiley += `</button>`
     var elSmiley = document.querySelector('.smiley');
     elSmiley.innerHTML = strHtmlSmiley;
 }
-
 
 function renderButtons() {
     var strHtmlButtons = `<button onclick="chooseLevel(this)" class="b1">Beginner</button>` + `<button onclick="chooseLevel(this)" class="b2">Medium</button>` + `<button onclick="chooseLevel(this)" class="b3">Expert</button>`;
@@ -171,13 +128,11 @@ function renderMarked() {
 }
 
 function renderLives() {
-    //var strHtmlLives = `Lives: ${gLives}`;
     var mushrooms = genMushrooms();
-    console.log("mushrooms", mushrooms)
+    //console.log("mushrooms", mushrooms)
     var strHtmlLives = `Lives: ${mushrooms}`;
     var elLife = document.querySelector('.life');
     elLife.innerHTML = strHtmlLives;
-
 }
 
 function genMushrooms() {
@@ -197,7 +152,7 @@ function renderBoard(board) {
             var cell = board[i][j]
             var className = `cell cell-${i}-${j}`;
             className += cell.isShown ? ' shown' : ' hidden';
-            strHTML += '<td class = "' + className + '"' + ' onclick="cellClicked(this,' + i + ',' + j + ')" oncontextmenu="cellMarked(this,' + i + ',' + j + ')">';
+            strHTML += '<td class = "' + className + '"' + ' onclick="cellClicked(' + i + ',' + j + ')" oncontextmenu="cellMarked(' + i + ',' + j + ')">';
 
             if (!cell.isShown) {
                 if (cell.isMarked) {
@@ -206,10 +161,10 @@ function renderBoard(board) {
             } else if (cell.isMine) {
                 strHTML += MINE;
             } else strHTML += cell.minesAroundCount;
-
             strHTML += '</td>';
         }
     }
+
     strHTML += '</tr></table>';
     var elBoard = document.querySelector('.board')
     elBoard.innerHTML = strHTML;
@@ -223,14 +178,12 @@ function renderBoard(board) {
                 boardValues[i][j] = '*';
             } else boardValues[i][j] = board[i][j].minesAroundCount;
         }
-
     }
     console.table(boardValues);
-
 }
 
 // Called when a cell (td) is clicked
-function cellClicked(elCell, i, j) {
+function cellClicked(i, j) {
     var cell = gBoard[i][j];
     if (cell.isShown) return;
     if (!gGame.isOn) return;
@@ -258,7 +211,7 @@ function cellClicked(elCell, i, j) {
             renderLives()
         } else {
             gGame.shownCount++;
-            console.log("gGame.shownCount", gGame.shownCount)
+            //console.log("gGame.shownCount", gGame.shownCount)
             expandsShown(i, j);
         }
         gIsVictory = checkGameOver();
@@ -267,23 +220,57 @@ function cellClicked(elCell, i, j) {
     renderBoard(gBoard);
 }
 
+function placeMines(board, idxI, idxJ) {
+    gMines = [];
+    var mineCount = 0;
+    while (mineCount < gLevel.MINES) {
+        var i = getRandomInt(0, gLevel.SIZE);
+        var j = getRandomInt(0, gLevel.SIZE);
+        if (!board[i][j].isMine && (i !== idxI && j !== idxJ)) {
+            board[i][j].isMine = true;
+            gMines.push({ i: i, j: j })
+            mineCount++;
+        }
+    }
+    for (var i = 0; i < board.length; i++) {
+        for (var j = 0; j < board[0].length; j++) {
+            if (!board[i][j].isMine) {
+                board[i][j].minesAroundCount = setMinesNegsCount(i, j, board)
+            }
+        }
+    }
+    return board;
+}
+
+function setMinesNegsCount(cellI, cellJ, mat) {
+    var negsCount = 0;
+    for (var i = cellI - 1; i <= cellI + 1; i++) {
+        if (i < 0 || i > mat.length - 1) continue;
+        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+            if (j < 0 || j > mat[i].length - 1) continue;
+            if (i === cellI && j === cellJ) continue;
+            if (mat[i][j].isMine) negsCount++;
+        }
+    }
+    return negsCount;
+}
+
 //Called on right click to mark a cell (suspected to be a mine) Search the web (and implement) how to hide the context menu on right click
-function cellMarked(elCell, i, j) {
+function cellMarked(i, j) {
     if (!gGame.isOn) return;
     if (gBoard[i][j].isShown == false) {
         if (!gBoard[i][j].isMarked) {
             if (gGame.markedCount < gLevel.MINES) {
                 gBoard[i][j].isMarked = true;
                 gGame.markedCount++;
-                renderMarked();
             }
         } else {
             gBoard[i][j].isMarked = false;
             gGame.markedCount--;
-            renderMarked();
         }
+        renderMarked();
     }
-    console.log("gGame.markedCount", gGame.markedCount);
+    //console.log("gGame.markedCount", gGame.markedCount);
     gIsVictory = checkGameOver();
     renderSmiley();
     renderBoard(gBoard);
@@ -315,7 +302,7 @@ function checkGameOver() {
 
 function checkBestScore() {
     gBestScoreLevel = 'bestScore' + gLevel.SIZE;
-    console.log(gBestScoreLevel)
+    //console.log(gBestScoreLevel)
     if (localStorage.getItem(gBestScoreLevel) === null) {
         localStorage.setItem(gBestScoreLevel, gGame.secsPassed);
     } else if (localStorage.getItem(gBestScoreLevel) > gGame.secsPassed) {
@@ -348,7 +335,7 @@ function expandsShown(i, j) {
                 if (!gBoard[idxI][idxJ].isShown && !gBoard[idxI][idxJ].isMarked) {
                     gBoard[idxI][idxJ].isShown = true;
                     gGame.shownCount++;
-                    console.log("gGame.shownCount", gGame.shownCount)
+                    //console.log("gGame.shownCount", gGame.shownCount)
                     expandsShown(idxI, idxJ);
                 }
             }
