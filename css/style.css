@@ -77,10 +77,25 @@ table td{
     
 }
 
+.bestScore{ 
+    text-align: center;
+    color: white;
+    display: inline; 
+    font-size: 20;
+    margin-right: 20px;
+    -webkit-text-stroke: black 0.5px;
+    
+}
+
 .smiley{
     text-align: center;
     display: inline;
 }
+
+.smiley img{
+    cursor: pointer;
+}
+
 
 .life {
     text-align: center;

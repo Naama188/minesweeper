@@ -21,17 +21,16 @@ var gGame = {
     secsPassed: 0
 }
 
-var gMillisec = 0;
-var gSec = 0;
-var gMin = 0;
 var gGameInterval;
-
 var gIsVictory = false;
 var gLives = 1;
+var gBestScoreLevel = 'bestScore' + gLevel.SIZE;
+var gAudio = new Audio("audio/win.wav"); //for gAudio pause on initGame();
 
 window.addEventListener("contextmenu", e => e.preventDefault());
 
 function initGame() {
+    gAudio.pause();
     clearInterval(gGameInterval);
     switch (gLevel.SIZE) {
         case 4:
@@ -59,6 +58,7 @@ function renderGame() {
     renderLives()
     renderSmiley();
     renderMarked();
+    renderBestScore();
 }
 
 function chooseLevel(level) {
@@ -83,6 +83,7 @@ function chooseLevel(level) {
             break;
         default:
     }
+    gBestScoreLevel = 'bestScore' + gLevel.SIZE;
     initGame();
 }
 
@@ -141,17 +142,17 @@ function setMinesNegsCount(cellI, cellJ, mat) {
 }
 
 function renderSmiley() {
-    var StrHtmlSmiley = `<button onclick="initGame()">`;
+    var strHtmlSmiley = `<button onclick="initGame()">`;
     var normal = '<img src="img/super-mario.png" style="height:40px">';
     var win = '<img src="img/starman.png" style="height:40px">';
     var lose = '<img src="img/koopa.png" style="height:40px">';
-    StrHtmlSmiley += gGame.isOn ? normal : gIsVictory ? win : lose;
+    strHtmlSmiley += gGame.isOn ? normal : gIsVictory ? win : lose;
     //StrHtmlSmiley += gGame.isOn ? SMILEYNORMAL : gIsVictory ? SMILEYWIN : SMILEYDEAD;
     console.log("gGame.isOn", gGame.isOn);
     console.log("gIsVictory", gIsVictory);
-    StrHtmlSmiley += `</button>`
+    strHtmlSmiley += `</button>`
     var elSmiley = document.querySelector('.smiley');
-    elSmiley.innerHTML = StrHtmlSmiley;
+    elSmiley.innerHTML = strHtmlSmiley;
 }
 
 
@@ -250,21 +251,19 @@ function cellClicked(elCell, i, j) {
                 clearInterval(gGameInterval);
                 gGame.isOn = false;
                 gIsVictory = false;
+                gAudio = new Audio("audio/lose.wav");
+                gAudio.play();
             }
             gLives--;
             renderLives()
         } else {
             gGame.shownCount++;
             console.log("gGame.shownCount", gGame.shownCount)
-            expandsShown(gBoard, elCell, i, j);
+            expandsShown(i, j);
         }
         gIsVictory = checkGameOver();
-        if (gIsVictory) gGame.isOn = false;
         renderSmiley();
-
-
     }
-
     renderBoard(gBoard);
 }
 
@@ -286,9 +285,7 @@ function cellMarked(elCell, i, j) {
     }
     console.log("gGame.markedCount", gGame.markedCount);
     gIsVictory = checkGameOver();
-    if (gIsVictory) gGame.isOn = false;
     renderSmiley();
-    //console.log("checkGameOver()", checkGameOver());
     renderBoard(gBoard);
 }
 
@@ -307,15 +304,40 @@ function checkGameOver() {
     //console.log("allMinesMarked", allMinesMarked)
     if (gGame.shownCount === (gLevel.SIZE ** 2 - gLevel.MINES) && allMinesMarked) {
         clearInterval(gGameInterval);
+        checkBestScore();
+        renderBestScore();
         gGame.isOn = false;
+        gAudio = new Audio("audio/win.wav");
+        gAudio.play();
         return true;
     } else return false;
+}
+
+function checkBestScore() {
+    gBestScoreLevel = 'bestScore' + gLevel.SIZE;
+    console.log(gBestScoreLevel)
+    if (localStorage.getItem(gBestScoreLevel) === null) {
+        localStorage.setItem(gBestScoreLevel, gGame.secsPassed);
+    } else if (localStorage.getItem(gBestScoreLevel) > gGame.secsPassed) {
+        localStorage.setItem(gBestScoreLevel, gGame.secsPassed);
+    }
+}
+
+function renderBestScore() {
+    var bestScore = localStorage.getItem(gBestScoreLevel);
+    if (bestScore !== null) {
+        var strHtmlBestScore = `Best Score: ${bestScore} seconds`;
+    } else {
+        strHtmlBestScore = `Best Score: Not Set Yet`
+    }
+    var elBestScore = document.querySelector('.bestScore');
+    elBestScore.innerHTML = strHtmlBestScore;
 }
 
 //When user clicks a cell with no mines around, we need to open not only that cell, but also its neighbors.
 //NOTE: start with a basic implementation that only opens the non-mine 1st degree neighbors
 //BONUS: if you have the time later, try to work more like the real algorithm (see description at the Bonuses section below)
-function expandsShown(board, elCell, i, j) {
+function expandsShown(i, j) {
     var cell = gBoard[i][j];
     if (cell.minesAroundCount === 0) {
         for (var idxI = i - 1; idxI <= i + 1; idxI++) {
@@ -323,11 +345,11 @@ function expandsShown(board, elCell, i, j) {
             for (var idxJ = j - 1; idxJ <= j + 1; idxJ++) {
                 if (idxJ < 0 || idxJ > gBoard[idxI].length - 1) continue;
                 if (idxI === i && idxJ === j) continue;
-                if (!gBoard[idxI][idxJ].isShown) {
+                if (!gBoard[idxI][idxJ].isShown && !gBoard[idxI][idxJ].isMarked) {
                     gBoard[idxI][idxJ].isShown = true;
                     gGame.shownCount++;
                     console.log("gGame.shownCount", gGame.shownCount)
-                    expandsShown(gBoard, elCell, idxI, idxJ);
+                    expandsShown(idxI, idxJ);
                 }
             }
         }
